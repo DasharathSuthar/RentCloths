@@ -1,0 +1,28 @@
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import Home from "../pages/Home/Home";
+import MasterPage from "../pages/Master/MasterPage";
+import ProductsByCategory from "../pages/ProductsByCategory/ProductsByCategory";
+import ProductDetails from "../pages/ProductDetails/ProductDetails";
+import AllProducts from "../pages/AllProducts/AllProducts";
+import MyOrders from "../pages/MyOrders/MyOrders";
+import ContactUs from "../pages/ContactUs/ContactUs";
+
+const Routing = () => {
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<MasterPage />}>
+          <Route index element={<Home />} />
+          <Route path="products" element={<AllProducts />} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="products/:category" element={<ProductsByCategory />} />
+          <Route path="products/:category/:id" element={<ProductDetails />} />
+          <Route path="myorders" element={<MyOrders />} />
+        </Route>
+      </Routes>
+    </>
+  );
+};
+
+export default Routing;
