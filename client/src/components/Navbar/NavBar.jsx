@@ -6,7 +6,8 @@ import { assets } from "../../assets/assets";
 const NavBar = () => {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
-  const { searchQuery, setSearchQuery, getCartCount, user, setUser } = useAppContext();
+  const { searchQuery, setSearchQuery, getCartCount, user, setUser } =
+    useAppContext();
   useEffect(() => {
     if (searchQuery.length > 0) {
       navigate("/products");
@@ -80,7 +81,10 @@ const NavBar = () => {
           </svg>
         </div>
 
-        <div className="relative cursor-pointer">
+        <div
+          onClick={() => navigate("/cart")}
+          className="relative cursor-pointer"
+        >
           <svg
             width="18"
             height="18"
@@ -102,7 +106,7 @@ const NavBar = () => {
 
         {!user ? (
           <button
-           onClick={()=>setUser(true)}
+            onClick={() => setUser(true)}
             className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-secondary transition text-white rounded-full text-sm"
           >
             Login
@@ -121,7 +125,10 @@ const NavBar = () => {
               >
                 My Orders
               </li>
-              <li onClick={() => setUser(false)} className="p-1.5 pl-3 cursor-pointer hover:text-primary">
+              <li
+                onClick={() => setUser(false)}
+                className="p-1.5 pl-3 cursor-pointer hover:text-primary"
+              >
                 Logout
               </li>
             </ul>

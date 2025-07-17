@@ -7,6 +7,7 @@ import ProductDetails from "../pages/ProductDetails/ProductDetails";
 import AllProducts from "../pages/AllProducts/AllProducts";
 import MyOrders from "../pages/MyOrders/MyOrders";
 import ContactUs from "../pages/ContactUs/ContactUs";
+import Cart from "../pages/Cart/Cart";
 
 const Routing = () => {
   return (
@@ -15,9 +16,10 @@ const Routing = () => {
         <Route path="/" element={<MasterPage />}>
           <Route index element={<Home />} />
           <Route path="products" element={<AllProducts />} />
-          <Route path="contact" element={<ContactUs />} />
           <Route path="products/:category" element={<ProductsByCategory />} />
           <Route path="products/:category/:id" element={<ProductDetails />} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="cart" element={<Cart />} />
           <Route path="myorders" element={<MyOrders />} />
         </Route>
       </Routes>
