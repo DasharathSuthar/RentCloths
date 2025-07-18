@@ -28,6 +28,24 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRouter);
 
+
+// // error handling
+// app.all('*', (req, res, next) => {
+//     next(new ApiError(404, `Route ${req.originalUrl} not found`))
+// })
+
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500
+    const message = err.message || "internal server error"
+
+    res.status(statusCode).json({
+        success: false,
+        message,
+        errors: err.errors || [],
+        data: null
+    })
+})
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

@@ -6,6 +6,10 @@ export class UserService {
     return await User.create(userData);
   }
 
+  async findById(id) {
+    return await User.findById(id).select("-password");
+  }
+
   async findByEmail(email) {
     return await User.findOne({ email });
   }
@@ -16,5 +20,9 @@ export class UserService {
 
   async comparePassword(password, hashedPassword) {
     return await bcrypt.compare(password, hashedPassword);
+  }
+
+  async updateCart(userId, cartItems) {
+    return await User.findByIdAndUpdate(userId, { cartItems })
   }
 }
