@@ -1,12 +1,12 @@
 import { UserService } from "../services/UserService.js";
-import { AuthService } from "../services/AuthService.js";
+import { AuthUserService } from "../services/AuthUserService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 class UserController {
   userService = new UserService();
-  authService = new AuthService();
+  authUserService = new AuthUserService();
 
   cookieOptions = {
     httpOnly: true,
@@ -50,39 +50,40 @@ class UserController {
       throw new ApiError(404, "User not Found with provided email.");
     }
 
-    const isPasswordCorrect = await this.userService.comparePassword(password, userCheck.password);
+    const isPasswordCorrect = await this.userService.comparePassword(
+      password,
+      userCheck.password,
+    );
 
-    const user = await this.userService.findById(userCheck._id)
+    const user = await this.userService.findById(userCheck._id);
 
     if (!isPasswordCorrect) {
       throw new ApiError(401, "Password is incorrect.");
     }
 
-    const token = this.authService.generateAccessToken(user)
+    const token = this.authUserService.generateAccessToken(user);
 
     res
       .status(200)
       .cookie("AccessToken", token, this.cookieOptions)
       .json(new ApiResponse(201, { user, token }, "Login successful."));
-  })
+  });
 
   logoutUser = asyncHandler(async (req, res) => {
     res
       .status(200)
       .clearCookie("AccessToken", this.cookieOptions)
-      .json(new ApiResponse(201, {}, "User logged out."))
-  })
+      .json(new ApiResponse(201, {}, "User logged out."));
+  });
 
   updateCart = asyncHandler(async (req, res) => {
-    const userId = req.user._id
-    const { cartItems } = req.body
+    const userId = req.user._id;
+    const { cartItems } = req.body;
 
     await this.userService.updateCart(userId, cartItems);
 
-    res
-      .status(200)
-      .json(new ApiResponse(200, {}, "Cart Updated."))
-  })
+    res.status(200).json(new ApiResponse(200, {}, "Cart Updated."));
+  });
 }
 
 export const userController = new UserController();

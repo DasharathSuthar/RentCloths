@@ -1,11 +1,10 @@
 import jwt from "jsonwebtoken";
 
-export class AuthService {
-  generateAccessToken(user) {
+export class AuthSellerService {
+  generateSellerAccessToken(email) {
     return jwt.sign(
       {
-        _id: user._id,
-        email: user.email,
+        email,
       },
       process.env.ACCESS_TOKEN_SECRET,
       {

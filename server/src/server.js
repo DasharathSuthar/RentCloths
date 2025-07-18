@@ -4,11 +4,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.js";
 import connectDB from "./config/db.js";
+import sellerRouter from "./routes/seller.routes.js";
+import productRouter from "./routes/product.routes.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-await connectDB()
+await connectDB();
 
 const allowedOrigins = ["http://localhost:5173"];
 
@@ -27,7 +29,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRouter);
-
+app.use("/api/seller", sellerRouter);
+app.use("/api/products", productRouter);
 
 // // error handling
 // app.all('*', (req, res, next) => {
@@ -35,16 +38,16 @@ app.use("/api/users", userRouter);
 // })
 
 app.use((err, req, res, next) => {
-    const statusCode = err.statusCode || 500
-    const message = err.message || "internal server error"
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "internal server error";
 
-    res.status(statusCode).json({
-        success: false,
-        message,
-        errors: err.errors || [],
-        data: null
-    })
-})
+  res.status(statusCode).json({
+    success: false,
+    message,
+    errors: err.errors || [],
+    data: null,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

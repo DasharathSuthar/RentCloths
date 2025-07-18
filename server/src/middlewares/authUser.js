@@ -1,26 +1,33 @@
-import jwt from 'jsonwebtoken'
-import { ApiError } from '../utils/ApiError.js';
+import jwt from "jsonwebtoken";
+import { ApiError } from "../utils/ApiError.js";
+import { UserService } from "../services/UserService.js";
 
-const authUser = async (req, resizeBy, next) => {
-    const { token } = req.cokkies;
+const authUser = async (req, res, next) => {
+  try {
+    const userService = new UserService();
+
+    const token =
+      req.cookies?.token || req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-        throw new ApiError(400, "AccessToken Denied")
+      throw new ApiError(401, "Unauthorized request");
     }
 
-    try {
-        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-        if (!decodedToken) {
-            throw new ApiError(400, "Not Authorized.")
-        }
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-        req.user = decodedToken;
+    const user = await userService.findById(decodedToken._id);
 
-        next()
-    } catch (error) {
-        console.log(error.message);
-        throw new ApiError(500, error.message)
+    if (!user) {
+      throw new ApiError(401, "Invalid accessToken");
     }
-}
 
-export default authUser
+    req.user = user;
+
+    next();
+  } catch (error) {
+    console.log(error.message);
+    throw new ApiError(500, error.message);
+  }
+};
+
+export default authUser;
