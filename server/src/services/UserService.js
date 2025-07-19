@@ -25,4 +25,5 @@ export class UserService {
   async updateCart(userId, cartItems) {
     return await User.findByIdAndUpdate(userId, { cartItems });
   }
+  
 }

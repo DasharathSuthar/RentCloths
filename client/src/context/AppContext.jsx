@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { dummyProducts } from "../assets/assets";
+// import { dummyProducts } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -10,11 +10,11 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
-  const currency = import.meta.env.VITE_CURRENCY;
+  // const currency = import.meta.env.VITE_CURRENCY;
 
   const navigate = useNavigate();
-  const [user, setUser] = useState(true);
-  const [showUser, setShowUser] = useState(true);
+  const [user, setUser] = useState(null);
+  const [showUser, setShowUser] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,7 +22,7 @@ export const AppContextProvider = ({ children }) => {
 
   const fetchSeller = async () => {
     try {
-      const { data } = await axios.get("/api/seller/is-auth");
+      const { data } = await axios.get("/api/seller/isAuth");
       if (data.success) {
         setIsSeller(true);
       } else {
@@ -33,21 +33,24 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
-  // const fecthUser = async () => {
-  //     try {
-  //         const { data } = await axios.get('/api/user/is-auth')
-  //         if (data.success) {
-  //             setUser(data.user)
-  //             setCartItems(data.user.cartItems)
-  //         }
-  //     } catch (error) {
-  //         setUser(null)
-  //     }
-  // }
+  const fecthUser = async () => {
+    try {
+      const { data } = await axios.get('/api/users/isAuth')
+      
+      if (data) {
+        setUser(data)
+        setCartItems(data.data.cartItems)
+      } else {
+        setUser(null)
+      }
+    } catch (error) {
+      setUser(null)
+    }
+  }
 
-  const fetchProducts = async () => {
-    setProducts(dummyProducts);
-  };
+  // const fetchProducts = async () => {
+  //   setProducts(dummyProducts);
+  // };
 
   const addToCart = (itemId) => {
     let cartData = structuredClone(cartItems);
@@ -101,9 +104,9 @@ export const AppContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    // fetchProducts();
     fetchSeller();
-    // fecthUser()
+    fecthUser();
   }, []);
 
   useEffect(() => {
@@ -132,7 +135,7 @@ export const AppContextProvider = ({ children }) => {
     isSeller,
     setIsSeller,
     products,
-    currency,
+    // currency,
     addToCart,
     updateCartItem,
     removeFromCart,
@@ -142,7 +145,7 @@ export const AppContextProvider = ({ children }) => {
     getCartCount,
     getCartAmount,
     axios,
-    fetchProducts,
+    // fetchProducts,
     setCartItems,
   };
 

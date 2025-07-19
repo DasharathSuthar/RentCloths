@@ -2,12 +2,32 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
+import toast from "react-hot-toast";
 
 const NavBar = () => {
   const [open, setOpen] = React.useState(false);
-  const navigate = useNavigate();
-  const { searchQuery, setSearchQuery, getCartCount, user, setUser } =
-    useAppContext();
+
+  const { navigate, searchQuery, setSearchQuery, getCartCount, user, setUser, setShowUser, axios } = useAppContext();
+
+  const handleLogin = () => {
+    setShowUser(true)
+  }
+
+  const handleLogout = async () => {
+    try {
+      const { data } = await axios.get("/api/users/logout")
+      if (data.message) {
+        // toast.success(data.message)
+        setUser(null)
+        navigate('/')
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
   useEffect(() => {
     if (searchQuery.length > 0) {
       navigate("/products");
@@ -16,7 +36,7 @@ const NavBar = () => {
 
   return (
     <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-secondary bg-white relative transition-all shadow-md">
-      <Link to="/">
+      <Link to="/"  onClick={() => setOpen(false)}>
         <h1 className="text-3xl text-primary font-bold border-b-2 border-b-primary ">
           Rent <span className="text-black">Cloths</span>
         </h1>
@@ -106,7 +126,7 @@ const NavBar = () => {
 
         {!user ? (
           <button
-            onClick={() => setUser(true)}
+            onClick={handleLogin}
             className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-secondary transition text-white rounded-full text-sm"
           >
             Login
@@ -126,7 +146,7 @@ const NavBar = () => {
                 My Orders
               </li>
               <li
-                onClick={() => setUser(false)}
+                onClick={handleLogout}
                 className="p-1.5 pl-3 cursor-pointer hover:text-primary"
               >
                 Logout
@@ -186,9 +206,17 @@ const NavBar = () => {
         >
           Contact
         </NavLink>
-        <button className="cursor-pointer px-6 py-2 mt-2 bg-primary hover:bg-secondary transition text-white rounded-full text-sm">
-          Login
-        </button>
+        {user && <NavLink to="/myorders" className="block" onClick={() => setOpen(false)} >My Orders</NavLink>}
+
+        {!user ? (
+          <button onClick={handleLogin} className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm">
+            Login
+          </button>
+        ) : (
+          <button onClick={handleLogout} className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm">
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );

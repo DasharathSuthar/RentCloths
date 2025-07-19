@@ -37,6 +37,10 @@ class SellerController {
     }
   });
 
+  sellerIsAuth = asyncHandler(async(req,res)=>{
+      res.status(200).json(new ApiResponse(200,{},"seller is Authorized."))
+  })
+
   sellerLogout = asyncHandler(async (req, res) => {
     res
       .status(200)
