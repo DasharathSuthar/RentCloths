@@ -75,6 +75,20 @@ class AddressController {
       .status(200)
       .json(new ApiResponse(200, addressList, "Address fecthed successfully."));
   });
+
+  addressById = asyncHandler(async (req, res) => {
+    const { addressId } = req.body;
+    if (!addressId) {
+      throw new ApiError(400, "AddressId is required.");
+    }
+
+    const addressById = await this.addressService.getAddressById(addressId);
+    if (!addressById) {
+      throw new ApiError(404, "Address not found with this Id.");
+    }
+
+    res.status(201).json(new ApiResponse(201, addressById, "Address found"));
+  });
 }
 
 export const addressController = new AddressController();

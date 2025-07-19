@@ -8,4 +8,8 @@ export class AddressService {
   async getAddresses(userId) {
     return await Address.find({ userId });
   }
+
+  async getAddressById(id) {
+    return await Address.findById(id);
+  }
 }
