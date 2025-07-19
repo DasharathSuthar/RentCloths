@@ -6,6 +6,7 @@ import userRouter from "./routes/user.routes.js";
 import connectDB from "./config/db.js";
 import sellerRouter from "./routes/seller.routes.js";
 import productRouter from "./routes/product.routes.js";
+import addressRouter from "./routes/address.routes.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -31,6 +32,7 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/seller", sellerRouter);
 app.use("/api/products", productRouter);
+app.use("/api/addresses", addressRouter);
 
 // // error handling
 // app.all('*', (req, res, next) => {
