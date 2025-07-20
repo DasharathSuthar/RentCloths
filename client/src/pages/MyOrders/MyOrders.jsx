@@ -1,6 +1,31 @@
+import { useEffect, useState } from "react";
 import { dummyOrders } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const MyOrders = () => {
+  const [myOrders, setMyOrders] = useState([])
+  const { axios, user } = useAppContext()
+
+  const fecthMyOrders = async () => {
+    try {
+      const { data } = await axios.get('/api/orders/user');
+      
+      if (data) {
+        setMyOrders(data.data)
+      }
+    } catch (error) {
+      toast.error(error)
+    }
+  }
+
+  useEffect(() => {
+    
+    if (user) {
+      fecthMyOrders()
+     
+    }
+  }, [user])
   return (
     <div className="mt-16 pb-16">
       <div className="flex flex-col items-end w-max mb-8">
@@ -8,15 +33,15 @@ const MyOrders = () => {
           My Orders
         </p>
       </div>
-      {dummyOrders.map((order, index) => (
+      {myOrders.map((order, index) => (
         <div
           key={index}
           className="border border-secondary/40 rounded-lg mb-10 p-4 py-5 max-w-4xl"
         >
           <p className="flex justify-between md:items-center text-gray-400 md:font-medium max-md:flex-col">
             <span>OrderId : {order._id}</span>
-            <span>Payment : {order.paymentType}</span>
-            <span>TotalAmount : ${order.amount}</span>
+            <span>Payment : {order.paymentMethod}</span>
+            <span>TotalAmount : ${order.totalAmount}</span>
           </p>
           {order.items.map((item, index) => (
             <div
@@ -26,7 +51,7 @@ const MyOrders = () => {
               <div className="flex items-center mb-4 md:mb-0">
                 <div className="bg-secondary/20 p-4 rounded-lg ">
                   <img
-                    src={item.product.image[0]}
+                    src={item.product.image}
                     className="w-16 h-16"
                     alt=""
                   />
@@ -41,8 +66,9 @@ const MyOrders = () => {
 
               <div className="flex flex-col justify-center md:ml-8 mb-4 md:mb-0">
                 <p>Quantity : {item.quantity || "1"} </p>
-                <p>Status : {order.status || "1"} </p>
+                <p>Status : {order.orderStatus || "1"} </p>
                 <p>Date : {new Date(order.createdAt).toLocaleDateString()}</p>
+                
               </div>
 
               <p className="text-lg font-medium text-secondary">

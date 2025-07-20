@@ -6,7 +6,7 @@ export class OrderService {
   }
 
   async getUserOrder(userId) {
-    return await Order.find({ userId });
+    return await Order.find({ userId }).populate("items.product");
   }
 
   async getOrderById(orderId) {

@@ -2,6 +2,7 @@ import React from "react";
 import ProductCard from "./ProductCard/ProductCard";
 import { dummyProducts } from "../../assets/assets";
 import { motion } from "framer-motion";
+import { useAppContext } from "../../context/AppContext";
 
 const containerVariants = {
   hidden: {},
@@ -18,6 +19,8 @@ const childVariants = {
 };
 
 const BestSeller = () => {
+    const { products } = useAppContext()
+
   return (
     <div className="mt-10">
       <p className="text-2xl font-medium md:text-3xl text-secondary underline text-center pb-4">
@@ -30,7 +33,7 @@ const BestSeller = () => {
         viewport={{ once: true }}
         className="mt-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
       >
-        {dummyProducts
+        {products
           .filter((product) => product.inStock)
           .slice(0, 5)
           .map((product) => (

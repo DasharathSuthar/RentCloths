@@ -14,13 +14,13 @@ const Routing = () => {
     <>
       <Routes>
         <Route path="/" element={<MasterPage />}>
-          {/* <Route index element={<Home />} />
+          <Route index element={<Home />} />
           <Route path="products" element={<AllProducts />} />
           <Route path="products/:category" element={<ProductsByCategory />} />
           <Route path="products/:category/:id" element={<ProductDetails />} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="cart" element={<Cart />} />
-          <Route path="myorders" element={<MyOrders />} /> */}
+          <Route path="myorders" element={<MyOrders />} />
         </Route>
       </Routes>
     </>

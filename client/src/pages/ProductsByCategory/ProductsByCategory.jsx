@@ -3,15 +3,18 @@ import { useParams } from "react-router-dom";
 import { categories } from "../../assets";
 import { dummyProducts } from "../../assets/assets";
 import ProductCard from "../../components/BestSeller/ProductCard/ProductCard";
+import { useAppContext } from "../../context/AppContext";
 
 const ProductsByCategory = () => {
+  const { products } = useAppContext()
+
   const { category } = useParams();
 
   const searchCategory = categories.find(
     (item) => item.path.toLowerCase() === category,
   );
 
-  const filteredProducts = dummyProducts.filter(
+  const filteredProducts = products.filter(
     (product) => product.category.toLowerCase() === category,
   );
 
