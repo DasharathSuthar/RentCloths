@@ -1,33 +1,32 @@
 import { useEffect, useState } from "react";
-import { dummyOrders } from "../../assets/assets";
+import { assets, dummyOrders } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const MyOrders = () => {
-  const [myOrders, setMyOrders] = useState([])
-  const { axios, user } = useAppContext()
+  const [myOrders, setMyOrders] = useState([]);
+  const { axios, user, navigate } = useAppContext();
 
   const fecthMyOrders = async () => {
     try {
-      const { data } = await axios.get('/api/orders/user');
-      
+      const { data } = await axios.get("/api/orders/user");
+
       if (data) {
-        setMyOrders(data.data)
+        setMyOrders(data.data);
       }
     } catch (error) {
-      toast.error(error)
+      toast.error(error);
     }
-  }
+  };
 
   useEffect(() => {
-    
     if (user) {
-      fecthMyOrders()
-     
+      fecthMyOrders();
     }
-  }, [user])
-  return (
-    <div className="mt-16 pb-16">
+  }, [user]);
+  return myOrders.length > 0 ? (
+    <div className="mt-16 pb-16 capitalize">
       <div className="flex flex-col items-end w-max mb-8">
         <p className="text-3xl font-medium capitalize text-primary underline">
           My Orders
@@ -40,8 +39,10 @@ const MyOrders = () => {
         >
           <p className="flex justify-between md:items-center text-gray-400 md:font-medium max-md:flex-col">
             <span>OrderId : {order._id}</span>
-            <span>Payment : {order.paymentMethod}</span>
-            <span>TotalAmount : ${order.totalAmount}</span>
+            <span className="uppercase">Payment : {order.paymentMethod}</span>
+            <span className="text-green-400">
+              TotalAmount : ${order.totalAmount}
+            </span>
           </p>
           {order.items.map((item, index) => (
             <div
@@ -50,11 +51,7 @@ const MyOrders = () => {
             >
               <div className="flex items-center mb-4 md:mb-0">
                 <div className="bg-secondary/20 p-4 rounded-lg ">
-                  <img
-                    src={item.product.image}
-                    className="w-16 h-16"
-                    alt=""
-                  />
+                  <img src={item.product.image} className="w-16 h-16" alt="" />
                 </div>
                 <div className="ml-4">
                   <h2 className="text-xl font-medium text-gray-800">
@@ -67,17 +64,39 @@ const MyOrders = () => {
               <div className="flex flex-col justify-center md:ml-8 mb-4 md:mb-0">
                 <p>Quantity : {item.quantity || "1"} </p>
                 <p>Status : {order.orderStatus || "1"} </p>
-                <p>Date : {new Date(order.createdAt).toLocaleDateString()}</p>
-                
+                <p>
+                  RentalStartDate :{" "}
+                  {new Date(order.rentalStartDate).toLocaleDateString()}
+                </p>
+                <p>
+                  RentalEndDate :{" "}
+                  {new Date(order.rentalEndDate).toLocaleDateString()}
+                </p>
+                <p>TotalRentDays : {item.rentalDays} </p>
               </div>
 
               <p className="text-lg font-medium text-secondary">
-                Amount : ${item.product.offerPrice * item.quantity}
+                AmountPerProduct : ${item.product.offerPrice * item.quantity}
               </p>
             </div>
           ))}
         </div>
       ))}
+    </div>
+  ) : (
+    <div className="mt-16 pb-16 h-64 capitalize flex flex-col items-center justify-center text-primary">
+      <p>no such orders found</p>
+      <p
+        onClick={() => navigate("/products")}
+        className="cursor-pointer text-center mt-2 w-44 text-secondary"
+      >
+        Continue Shopping{" "}
+        <img
+          className="inline-block ml-2"
+          src={assets.black_arrow_icon}
+          alt=""
+        />{" "}
+      </p>
     </div>
   );
 };

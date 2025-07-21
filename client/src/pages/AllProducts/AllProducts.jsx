@@ -3,7 +3,7 @@ import ProductCard from "../../components/BestSeller/ProductCard/ProductCard";
 import { useAppContext } from "../../context/AppContext";
 
 const AllProducts = () => {
-  const { products, searchQuery } = useAppContext();
+  const { products, searchQuery, isProductLoading } = useAppContext();
 
   const [filteredProducts, setFilteredProducts] = useState([]);
 
@@ -19,7 +19,15 @@ const AllProducts = () => {
     }
   }, [products, searchQuery]);
 
-  return (
+  if (isProductLoading) {
+    return (
+      <div className="flex h-60 text-primary items-center justify-center mt-20 pb-20">
+        <p>Loading products...</p>
+      </div>
+    );
+  }
+
+  return products.length > 0 ? (
     <div className="mt-16 flex flex-col">
       <div className="flex flex-col items-end w-max">
         <p className="text-3xl underline font-medium capitalize text-primary">
@@ -33,6 +41,10 @@ const AllProducts = () => {
             <ProductCard product={product} key={product._id} />
           ))}
       </div>
+    </div>
+  ) : (
+    <div className="flex h-60 text-primary items-center justify-center mt-20 pb-20">
+      <p>No Product Found.</p>
     </div>
   );
 };

@@ -19,7 +19,7 @@ const childVariants = {
 };
 
 const BestSeller = () => {
-    const { products } = useAppContext()
+  const { products } = useAppContext();
 
   return (
     <div className="mt-10">

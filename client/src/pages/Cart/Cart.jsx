@@ -1,248 +1,318 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
+import { assets } from "../../assets/assets";
 
 const Cart = () => {
+  const {
+    axios,
+    user,
+    products,
+    cartItems,
+    setCartItems,
+    removeFromCart,
+    getCartCount,
+    updateCartItem,
+    navigate,
+  } = useAppContext();
 
-  const { axios, user, products, cartItems, setCartItems, removeFromCart, getCartCount, updateCartItem, getCartAmount, navigate } = useAppContext()
-
-  const [cartArray, setCartArray] = useState([])
-  const [addresses, setAddresses] = useState([])
-  const [showAddress, setShowAddress] = useState(false)
-  const [selectedAddress, setSelectedAddress] = useState(null)
-  const [paymentOption, setPaymentOption] = useState('COD')
+  const [cartArray, setCartArray] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [paymentOption, setPaymentOption] = useState("COD");
 
   const getCart = () => {
-    let tempArray = []
+    let tempArray = [];
     for (const key in cartItems) {
-      const product = products.find(item => item._id === key)
-      product.quantity = cartItems[key]
-      tempArray.push(product)
+      const product = products.find((item) => item._id === key);
+      tempArray.push({
+        ...product,
+        quantity: cartItems[key],
+        size: "M",
+        rentalStartDate: "",
+        rentalEndDate: "",
+        rentalDays: 0,
+      });
     }
-    setCartArray(tempArray)
-  }
-
+    setCartArray(tempArray);
+  };
 
   const getUserAddress = async () => {
     try {
-      const { data } = await axios.get('/api/addresses/list')
+      const { data } = await axios.get("/api/addresses/list");
       if (data.data) {
-        setAddresses(data.data)
+        setAddresses(data.data);
         if (data.data.length > 0) {
-          setSelectedAddress(data.data[0])
+          setSelectedAddress(data.data[0]);
         }
       } else {
-        toast.error(data.message)
+        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message)
-
+      toast.error(error.message);
     }
-  }
+  };
+
+  const updateCartProduct = (index, field, value) => {
+    const updated = [...cartArray];
+    updated[index][field] = value;
+
+    const today = new Date().setHours(0, 0, 0, 0);
+    const startDate = new Date(updated[index].rentalStartDate).setHours(
+      0,
+      0,
+      0,
+      0,
+    );
+    const endDate = new Date(updated[index].rentalEndDate).setHours(0, 0, 0, 0);
+
+    if (startDate && startDate < today) {
+      toast.error("Start date cannot be in the past");
+      updated[index].rentalStartDate = "";
+    }
+
+    if (startDate && endDate && endDate < startDate) {
+      toast.error("End date cannot be before start date");
+      updated[index].rentalEndDate = "";
+    }
+
+    if (updated[index].rentalStartDate && updated[index].rentalEndDate) {
+      const start = new Date(updated[index].rentalStartDate);
+      const end = new Date(updated[index].rentalEndDate);
+      const rentalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      updated[index].rentalDays = rentalDays > 0 ? rentalDays : 0;
+    }
+
+    setCartArray(updated);
+  };
+
+  const getCartAmount = () => {
+    let totalAmount = 0;
+    for (const item of cartArray) {
+      const rentalCost = item.offerPrice * item.quantity * item.rentalDays;
+      totalAmount += rentalCost;
+    }
+    return Math.floor(totalAmount * 100) / 100;
+  };
 
   const placeOrder = async () => {
     try {
       if (!selectedAddress) {
-        toast.error("Please Select an Address")
+        toast.error("Please select an address");
+        return;
       }
 
-      // cod
-      if (paymentOption === "COD") {
-        const { data } = await axios.post("/api/orders/create", {
-          items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
-          addressId: selectedAddress._id
-        })
-        if (data) {
-          toast.success(data.message)
-          setCartItems({})
-          navigate('/myorders')
-        } else {
-          toast.error(data.message)
-        }
+      const confirmOrder = window.confirm(
+        "Are you sure you want to place this order?",
+      );
+      if (!confirmOrder) return;
+
+      const itemsPayload = cartArray.map((item) => ({
+        product: item._id,
+        quantity: item.quantity,
+        size: item.size,
+        rentalDays: item.rentalDays,
+        rentalStartDate: item.rentalStartDate,
+        rentalEndDate: item.rentalEndDate,
+      }));
+
+      const { data } = await axios.post("/api/orders/create", {
+        items: itemsPayload,
+        addressId: selectedAddress._id,
+        paymentMethod: paymentOption.toLowerCase(),
+      });
+
+      if (data?.data) {
+        toast.success(data.message);
+        setCartItems({});
+        navigate("/myorders");
+      } else {
+        toast.error(data.message);
       }
-      // else {
-      //   const { data } = await axios.post("/api/order/stripe", {
-      //     items: cartArray.map(item => ({ product: item._id, quantity: item.quantity })),
-      //     address: selectedAddress._id
-      //   })
-      //   if (data.success) {
-      //     window.location.replace(data.url)
-
-      //   } else {
-      //     toast.error(data.message)
-      //   }
-      // }
-
     } catch (error) {
-      toast.error(error)
+      toast.error(error?.response?.data?.message || "Order failed");
     }
-  }
+  };
 
   useEffect(() => {
-    if (products.length > 0 && cartItems) {
-      getCart()
-    }
-  }, [products, cartItems])
+    if (products.length > 0 && cartItems) getCart();
+  }, [products, cartItems]);
 
   useEffect(() => {
-    if (user) {
-      getUserAddress()
-    }
-  }, [user])
+    if (user) getUserAddress();
+  }, [user]);
 
-  return products.length > 0 && cartItems ? (
-    <div className="flex flex-col md:flex-row py-16 max-w-6xl w-full px-6 mx-auto">
-      <div className="flex-1 max-w-4xl">
-        <h1 className="text-3xl font-medium mb-6 text-primary underline">
-          Shopping Cart <span className="text-sm text-secondary">{getCartCount()} Items</span>
-        </h1>
+  return (
+    <div className="p-6 max-w-6xl mx-auto capitalize">
+      <h1 className="text-3xl font-semibold mb-6 text-primary underline">
+        Your Cart
+      </h1>
 
-        <div className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 text-base font-medium pb-3">
-          <p className="text-left">Product Details</p>
-          <p className="text-center">Subtotal</p>
-          <p className="text-center">Action</p>
-        </div>
-
-        {cartArray.map((product, index) => (
+      {cartArray.length > 0 ? (
+        cartArray.map((product, index) => (
           <div
-            key={index}
-            className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3"
+            key={product._id}
+            className="border border-secondary/50 p-4 rounded mb-4 flex flex-col md:flex-row justify-between"
           >
-            <div className="flex items-center md:gap-6 gap-3">
-              <div onClick={() => navigate(`/products/${product.category.toLoweCase()}/${product._id}`)} className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded ">
-                <img
-                  className="max-w-full h-full object-cover"
-                  src={product.image}
-                  alt={product.name}
-                />
-              </div>
+            <div className="flex gap-4 items-center">
+              <img
+                src={product.image}
+                alt={product.name}
+                className="w-24 h-24 object-cover"
+              />
               <div>
-                <p className="hidden md:block font-semibold">{product.name}</p>
-                <div className="font-normal text-gray-500/70">
-                  <p>
-                    Size: <span>{product.size || "N/A"}</span>
-                  </p>
-                  <div className="flex items-center">
-                    <p>Qty:</p>
-                    <select onChange={(e) => updateCartItem(product._id, Number(e.target.value))} className='outline-none' value={cartItems[product._id]}>
-                      {Array(cartItems[product._id] > 9 ? cartItems[product._id] : 9).fill('').map((_, index) => (
-                        <option key={index} value={index + 1}>{index + 1}</option>
-                      ))}
-                    </select>
-                  </div>
+                <h2 className="font-bold capitalize">{product.name}</h2>
+                <p>Price per Day: ${product.offerPrice}</p>
+                <label>
+                  Size:
+                  <select
+                    className="ml-2 border"
+                    value={product.size}
+                    onChange={(e) =>
+                      updateCartProduct(index, "size", e.target.value)
+                    }
+                  >
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                  </select>
+                </label>
+                <div className="mt-2">
+                  <label>
+                    Start Date:
+                    <input
+                      type="date"
+                      className="ml-2 border"
+                      min={new Date().toISOString().split("T")[0]}
+                      value={product.rentalStartDate}
+                      onChange={(e) =>
+                        updateCartProduct(
+                          index,
+                          "rentalStartDate",
+                          e.target.value,
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="ml-4">
+                    End Date:
+                    <input
+                      type="date"
+                      className="ml-2 border"
+                      min={
+                        product.rentalStartDate ||
+                        new Date().toISOString().split("T")[0]
+                      }
+                      value={product.rentalEndDate}
+                      onChange={(e) =>
+                        updateCartProduct(
+                          index,
+                          "rentalEndDate",
+                          e.target.value,
+                        )
+                      }
+                    />
+                  </label>
                 </div>
-              </div>
-            </div>
-            <p className="text-center">
-              ${product.offerPrice * product.quantity}
-            </p>
-            <button onClick={() => removeFromCart(product._id)} className="cursor-pointer mx-auto">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="m12.5 7.5-5 5m0-5 5 5m5.833-2.5a8.333 8.333 0 1 1-16.667 0 8.333 8.333 0 0 1 16.667 0"
-                  stroke="#4b2091"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        ))}
-
-        <button
-          onClick={() => {
-            navigate("/products");
-            scrollTo(0, 0)
-          }}
-          className="group cursor-pointer flex items-center mt-8 gap-2 text-secondary font-medium"
-        >
-          <svg
-            width="15"
-            height="11"
-            viewBox="0 0 15 11"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M14.09 5.5H1M6.143 10 1 5.5 6.143 1"
-              stroke="#615fff"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Continue Shopping
-        </button>
-      </div>
-
-      <div className="max-w-[360px] w-full bg-gray-100/40 p-5 max-md:mt-16 border border-gray-300/70">
-        <h2 className="text-xl md:text-xl font-medium">Order Summary</h2>
-        <hr className="border-gray-300 my-5" />
-
-        <div className="mb-6">
-          <p className="text-sm font-medium uppercase">Delivery Address</p>
-          <div className="relative flex justify-between items-start mt-2">
-            <p className="text-gray-500">{selectedAddress ? `${selectedAddress.street},${selectedAddress.city},${selectedAddress.state},${selectedAddress.country}` : "No address found"} </p>
-            <button
-              onClick={() => setShowAddress(!showAddress)}
-              className="text-secondary hover:underline cursor-pointer"
-            >
-              Change
-            </button>
-            {showAddress && (
-              <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                {addresses.map((address, index) => (
-                  <p key={index} onClick={() => { setSelectedAddress(address); setShowAddress(false) }} className="text-gray-500 p-2 hover:bg-gray-100">
-                    {address.street},{address.city},{address.state},{address.country},
-                  </p>
-                ))}
-                <p onClick={() => navigate('/add-address')} className="text-indigo-500 text-center cursor-pointer p-2 hover:bg-indigo-500/10">
-                  Add address
+                <p className="text-sm mt-1">
+                  Rental Days: {product.rentalDays}
                 </p>
               </div>
-            )}
+            </div>
+
+            <div className="flex flex-col items-center justify-between">
+              <select
+                className="border w-10 text-center"
+                value={product.quantity}
+                onChange={(e) =>
+                  updateCartItem(product._id, Number(e.target.value))
+                }
+              >
+                {Array(9)
+                  .fill(null)
+                  .map((_, i) => (
+                    <option key={i} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+              </select>
+              <p className="mt-2 text-green-500">
+                Subtotal: $
+                {product.offerPrice * product.quantity * product.rentalDays}
+              </p>
+              <button
+                onClick={() => removeFromCart(product._id)}
+                className="mt-2"
+              >
+                <img src={assets.remove_icon} alt="remove" />
+              </button>
+            </div>
           </div>
+        ))
+      ) : (
+        <div>
+          <p>No items in cart</p>
+          <p
+            onClick={() => navigate("/products")}
+            className="cursor-pointer mt-2 w-44 text-secondary"
+          >
+            Continue Shopping{" "}
+            <img
+              className="inline-block ml-2"
+              src={assets.black_arrow_icon}
+              alt=""
+            />{" "}
+          </p>
+        </div>
+      )}
 
-          <p className="text-sm font-medium uppercase mt-6">Payment Method</p>
+      <div className="mt-8 border border-secondary/50 p-4 rounded">
+        <h2 className="text-xl font-medium mb-4 text-secondary">
+          Order Summary
+        </h2>
+        <p>Total Items: {getCartCount()}</p>
+        <p className="text-green-500">Total Amount: ${getCartAmount()}</p>
 
-          <select onChange={(e) => setPaymentOption(e.target.value)} className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none">
-            <option value="COD">Cash On Delivery</option>
-            <option value="Online">Online Payment</option>
+        <label className="block mt-4">
+          Payment Method:
+          <select
+            value={paymentOption}
+            onChange={(e) => setPaymentOption(e.target.value)}
+            className="ml-2 border px-2"
+          >
+            <option value="COD">Cash on Delivery</option>
+            <option value="Online">Online</option>
           </select>
-        </div>
+        </label>
 
-        <hr className="border-gray-300" />
+        <label className="block mt-4">
+          Shipping Address:
+          <select
+            onChange={(e) =>
+              setSelectedAddress(
+                addresses.find((addr) => addr._id === e.target.value),
+              )
+            }
+            className="ml-2 border px-2 capitalize"
+          >
+            {addresses.map((addr) => (
+              <option key={addr._id} value={addr._id}>
+                {addr.street}, {addr.city}
+              </option>
+            ))}
+          </select>
+        </label>
 
-        <div className="text-gray-500 mt-4 space-y-2">
-          <p className="flex justify-between">
-            <span>Price</span><span>${getCartAmount()}</span>
-          </p>
-          <p className="flex justify-between">
-            <span>Shipping Fee</span><span className="text-green-600">Free</span>
-          </p>
-          <p className="flex justify-between">
-            <span>Tax (2%)</span><span>${getCartAmount() * 2 / 100} </span>
-          </p>
-          <p className="flex justify-between text-lg font-medium mt-3">
-            <span>Total Amount:</span><span>${getCartAmount() + getCartAmount() * 2 / 100} </span>
-          </p>
-        </div>
-
-        <button onClick={placeOrder} className="w-full py-3 mt-6 cursor-pointer bg-secondary text-white font-medium hover:bg-primary transition">
-          {
-            paymentOption === "COD" ? "Place Order" : "Process to checkout"
-          }
+        <button
+          onClick={placeOrder}
+          className="mt-6 bg-secondary text-white px-6 py-2 rounded hover:bg-primary"
+        >
+          {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
         </button>
       </div>
     </div>
-  ) : null
+  );
 };
 
 export default Cart;

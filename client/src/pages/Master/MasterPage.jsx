@@ -2,11 +2,11 @@ import React from "react";
 import NavBar from "../../components/Navbar/NavBar";
 import { Outlet } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
-import { useAppContext } from '../../context/AppContext'
+import { useAppContext } from "../../context/AppContext";
 import LoginForm from "../../components/loginForm/LoginForm";
 
 const MasterPage = () => {
-  const { showUser } = useAppContext()
+  const { showUser } = useAppContext();
 
   return (
     <>

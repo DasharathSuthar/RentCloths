@@ -1,36 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
-import { toast, ToastContainer } from 'react-toastify'
-import { assets } from "../../assets/assets"
+import { toast, ToastContainer } from "react-toastify";
+import { assets } from "../../assets/assets";
 
 const NavBar = () => {
   const [open, setOpen] = useState(false);
 
-  const { navigate, user, setUser, setShowUser, axios, searchQuery, setSearchQuery, getCartCount } = useAppContext();
+  const {
+    navigate,
+    user,
+    setUser,
+    setShowUser,
+    axios,
+    searchQuery,
+    setSearchQuery,
+    getCartCount,
+  } = useAppContext();
 
   const handleLogout = async () => {
     try {
-      const { data } = await axios.get('/api/users/logout');
+      const { data } = await axios.get("/api/users/logout");
       if (data.data) {
         toast.success(data.message);
         setUser(null);
-        navigate("/")
+        navigate("/");
       }
-
     } catch (error) {
       toast.error(error);
     }
-  }
+  };
   const handleLogin = () => {
-    setShowUser(true)
-  }
+    setShowUser(true);
+  };
 
   useEffect(() => {
     if (searchQuery.length > 0) {
-      navigate("/products")
+      navigate("/products");
     }
-  }, [searchQuery])
+  }, [searchQuery]);
 
   return (
     <>
@@ -157,11 +165,19 @@ const NavBar = () => {
         </div>
 
         <div className="sm:hidden flex items-center gap-6">
-          <div onClick={() => navigate("/cart")} className="relative cursor-pointer">
+          <div
+            onClick={() => navigate("/cart")}
+            className="relative cursor-pointer"
+          >
             <img src={assets.cart_icon} className="w-6 opacity-80" alt="" />
-            <button className="absolute -top-2 -right-3 text-xs text-white bg-indigo-500 w-[18px] h-[18px] rounded-full">{getCartCount()}</button>
+            <button className="absolute -top-2 -right-3 text-xs text-white bg-indigo-500 w-[18px] h-[18px] rounded-full">
+              {getCartCount()}
+            </button>
           </div>
-          <button onClick={() => open ? setOpen(false) : setOpen(true)} aria-label="Menu">
+          <button
+            onClick={() => (open ? setOpen(false) : setOpen(true))}
+            aria-label="Menu"
+          >
             {/* Menu Icon SVG */}
             <img src={assets.menu_icon} alt="" />
           </button>
@@ -198,18 +214,28 @@ const NavBar = () => {
           >
             Contact
           </NavLink>
-          {user && <NavLink to="/myorders" className="block" onClick={() => setOpen(false)} >My Orders</NavLink>}
+          {user && (
+            <NavLink
+              to="/myorders"
+              className="block"
+              onClick={() => setOpen(false)}
+            >
+              My Orders
+            </NavLink>
+          )}
 
           {!user ? (
             <button
               onClick={handleLogin}
-              className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm">
+              className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm"
+            >
               Login
             </button>
           ) : (
             <button
               onClick={handleLogout}
-              className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm">
+              className="cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm"
+            >
               Logout
             </button>
           )}
