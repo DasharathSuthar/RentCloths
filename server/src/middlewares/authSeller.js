@@ -22,7 +22,7 @@ const authSeller = async (req, res, next) => {
       throw new ApiError(401, "Unauthorized request.");
     }
   } catch (error) {
-    console.log(error.message);
+    // console.log(error.message);
     throw new ApiError(500, error.message);
   }
 };

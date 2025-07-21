@@ -6,8 +6,8 @@ import { upload } from "../middlewares/multer.js";
 const productRouter = Router();
 
 productRouter.post(
-  "/add-product",
-  upload.single("productImage"),
+  "/addproduct",
+  upload.single("image"),
   authSeller,
   productController.addProduct,
 );

@@ -29,6 +29,7 @@ const productSchema = new Schema(
     sizes: {
       type: Array,
       required: true,
+      default: ["SM", "M", "LG", "X", "XL", "XXL"],
     },
     inStock: {
       type: Boolean,

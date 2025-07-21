@@ -85,11 +85,11 @@ class UserController {
     res.status(200).json(new ApiResponse(200, {}, "Cart Updated."));
   });
 
-  userIsAuth = asyncHandler(async (req,res)=>{
-      const user = await this.userService.findById(req.user._id)
-      
-      res.status(201).json(new ApiResponse(201,user,"User is authorized."))
-  })
+  userIsAuth = asyncHandler(async (req, res) => {
+    const user = await this.userService.findById(req.user._id);
+
+    res.status(201).json(new ApiResponse(201, user, "User is authorized."));
+  });
 }
 
 export const userController = new UserController();

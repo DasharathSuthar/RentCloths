@@ -8,11 +8,10 @@ class ProductController {
   productService = new ProductService();
 
   addProduct = asyncHandler(async (req, res) => {
-    const { name, description, price, offerPrice, image, category, sizes } =
-      req.body;
+    const { name, description, price, offerPrice, category } = req.body;
 
     if (
-      [name, description, price, offerPrice, image, category, sizes].some(
+      [name, description, price, offerPrice, category].some(
         (field) => field?.trim() === "",
       )
     ) {
@@ -46,7 +45,6 @@ class ProductController {
       offerPrice,
       image: productImage.url || "",
       category,
-      sizes,
     };
     const product = await this.productService.addProduct(productData);
 

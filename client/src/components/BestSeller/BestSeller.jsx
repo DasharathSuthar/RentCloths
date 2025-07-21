@@ -19,9 +19,17 @@ const childVariants = {
 };
 
 const BestSeller = () => {
-  const { products } = useAppContext();
+  const { products, isProductLoading } = useAppContext();
 
-  return (
+  if (isProductLoading) {
+    return (
+      <div className="flex h-60 text-primary items-center justify-center mt-20 pb-20">
+        <p>Loading products...</p>
+      </div>
+    );
+  }
+
+  return products.length > 0 ? (
     <div className="mt-10">
       <p className="text-2xl font-medium md:text-3xl text-secondary underline text-center pb-4">
         Best Sellers
@@ -43,7 +51,7 @@ const BestSeller = () => {
           ))}
       </motion.div>
     </div>
-  );
+  ) : null;
 };
 
 export default BestSeller;

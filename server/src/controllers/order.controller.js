@@ -15,6 +15,21 @@ class OrderController {
     const { items, addressId, rentalStartDate, rentalEndDate, paymentMethod } =
       req.body;
 
+    if (
+      !Array.isArray(items) ||
+      items.length === 0 ||
+      typeof addressId !== "string" ||
+      addressId.trim() === "" ||
+      typeof rentalStartDate !== "string" ||
+      rentalStartDate.trim() === "" ||
+      typeof rentalEndDate !== "string" ||
+      rentalEndDate.trim() === "" ||
+      typeof paymentMethod !== "string" ||
+      paymentMethod.trim() === ""
+    ) {
+      throw new ApiError(400, "All fields are required and must be valid.");
+    }
+
     if (!items || items.length === 0) {
       throw new ApiError(400, "No items provided.");
     }

@@ -23,7 +23,7 @@ const ProductDetails = () => {
       </div>
     );
   }
-  
+
   return product ? (
     product && (
       <div className="mt-16 capitalize overflow-hidden">
@@ -74,16 +74,16 @@ const ProductDetails = () => {
               <li>{product.description}</li>
               {/* ))} */}
             </ul>
-            <p className="mt-6 text-base">Sizes :
-              {
-                product.sizes.map((size, index) => (
-                  <span key={index} className="text-sm uppercase">{size} </span>
-                ))
-              }
+            <p className="mt-6 text-base">
+              Sizes :
+              {product.sizes.map((size, index) => (
+                <span key={index} className="text-sm uppercase">
+                  {size}{" "}
+                </span>
+              ))}
             </p>
 
             <div className="flex items-center mt-10 gap-4 text-base">
-             
               <button
                 onClick={() => addToCart(product._id)}
                 className="w-full py-3.5 cursor-pointer font-medium bg-gray-100 text-gray-800/80 hover:bg-gray-200 transition"
@@ -108,7 +108,7 @@ const ProductDetails = () => {
     <div className="flex h-60 text-primary items-center justify-center mt-20 pb-20">
       <p>No Product Found.</p>
     </div>
-  )
+  );
 };
 
 export default ProductDetails;

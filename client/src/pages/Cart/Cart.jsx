@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import toast from "react-hot-toast";
+import { toast, ToastContainer } from "react-toastify";
 import { assets } from "../../assets/assets";
 
 const Cart = () => {
@@ -45,11 +45,9 @@ const Cart = () => {
         if (data.data.length > 0) {
           setSelectedAddress(data.data[0]);
         }
-      } else {
-        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -143,175 +141,184 @@ const Cart = () => {
   }, [user]);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto capitalize">
-      <h1 className="text-3xl font-semibold mb-6 text-primary underline">
-        Your Cart
-      </h1>
+    <>
+      <ToastContainer position="top-center" autoClose={2000} />
+      <div className="p-6 max-w-6xl mx-auto capitalize">
+        <h1 className="text-3xl font-semibold mb-6 text-primary underline">
+          Your Cart
+        </h1>
 
-      {cartArray.length > 0 ? (
-        cartArray.map((product, index) => (
-          <div
-            key={product._id}
-            className="border border-secondary/50 p-4 rounded mb-4 flex flex-col md:flex-row justify-between"
-          >
-            <div className="flex gap-4 items-center">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-24 h-24 object-cover"
-              />
-              <div>
-                <h2 className="font-bold capitalize">{product.name}</h2>
-                <p>Price per Day: ${product.offerPrice}</p>
-                <label>
-                  Size:
+        {cartArray.length > 0 ? (
+          cartArray.map((product, index) => (
+            <div
+              key={product._id}
+              className="border border-secondary/50 p-4 rounded mb-4 flex flex-col md:flex-row justify-between"
+            >
+              <div className="flex gap-4 items-center">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-24 h-24 object-cover"
+                />
+                <div>
+                  <h2 className="font-bold capitalize">{product.name}</h2>
+                  <p>Price per Day: ${product.offerPrice}</p>
+                  <label>
+                    Size:
+                    <select
+                      className="ml-2 border"
+                      value={product.size}
+                      onChange={(e) =>
+                        updateCartProduct(index, "size", e.target.value)
+                      }
+                    >
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                    </select>
+                  </label>
+                  <div className="mt-2">
+                    <label>
+                      Start Date:
+                      <input
+                        type="date"
+                        className="ml-2 border"
+                        min={new Date().toISOString().split("T")[0]}
+                        value={product.rentalStartDate}
+                        required
+                        onChange={(e) =>
+                          updateCartProduct(
+                            index,
+                            "rentalStartDate",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </label>
+                    <label className="ml-4">
+                      End Date:
+                      <input
+                        type="date"
+                        className="ml-2 border"
+                        min={
+                          product.rentalStartDate ||
+                          new Date().toISOString().split("T")[0]
+                        }
+                        value={product.rentalEndDate}
+                        onChange={(e) =>
+                          updateCartProduct(
+                            index,
+                            "rentalEndDate",
+                            e.target.value,
+                          )
+                        }
+                        required
+                      />
+                    </label>
+                  </div>
+                  <p className="text-sm mt-1">
+                    Rental Days: {product.rentalDays}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center justify-between">
+                <div>
+                  <label htmlFor="qnt">Qnt.</label>
                   <select
-                    className="ml-2 border"
-                    value={product.size}
+                    className="border ml-2 w-10 text-center"
+                    value={product.quantity}
+                    id="qnt"
                     onChange={(e) =>
-                      updateCartProduct(index, "size", e.target.value)
+                      updateCartItem(product._id, Number(e.target.value))
                     }
                   >
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
+                    {Array(9)
+                      .fill(null)
+                      .map((_, i) => (
+                        <option key={i} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
                   </select>
-                </label>
-                <div className="mt-2">
-                  <label>
-                    Start Date:
-                    <input
-                      type="date"
-                      className="ml-2 border"
-                      min={new Date().toISOString().split("T")[0]}
-                      value={product.rentalStartDate}
-                      onChange={(e) =>
-                        updateCartProduct(
-                          index,
-                          "rentalStartDate",
-                          e.target.value,
-                        )
-                      }
-                    />
-                  </label>
-                  <label className="ml-4">
-                    End Date:
-                    <input
-                      type="date"
-                      className="ml-2 border"
-                      min={
-                        product.rentalStartDate ||
-                        new Date().toISOString().split("T")[0]
-                      }
-                      value={product.rentalEndDate}
-                      onChange={(e) =>
-                        updateCartProduct(
-                          index,
-                          "rentalEndDate",
-                          e.target.value,
-                        )
-                      }
-                    />
-                  </label>
                 </div>
-                <p className="text-sm mt-1">
-                  Rental Days: {product.rentalDays}
+                <p className="mt-2 text-green-500">
+                  Subtotal: $
+                  {product.offerPrice * product.quantity * product.rentalDays}
                 </p>
+                <button
+                  onClick={() => removeFromCart(product._id)}
+                  className="mt-2"
+                >
+                  <img src={assets.remove_icon} alt="remove" />
+                </button>
               </div>
             </div>
-
-            <div className="flex flex-col items-center justify-between">
-              <select
-                className="border w-10 text-center"
-                value={product.quantity}
-                onChange={(e) =>
-                  updateCartItem(product._id, Number(e.target.value))
-                }
-              >
-                {Array(9)
-                  .fill(null)
-                  .map((_, i) => (
-                    <option key={i} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-              </select>
-              <p className="mt-2 text-green-500">
-                Subtotal: $
-                {product.offerPrice * product.quantity * product.rentalDays}
-              </p>
-              <button
-                onClick={() => removeFromCart(product._id)}
-                className="mt-2"
-              >
-                <img src={assets.remove_icon} alt="remove" />
-              </button>
-            </div>
+          ))
+        ) : (
+          <div>
+            <p>No items in cart</p>
+            <p
+              onClick={() => navigate("/products")}
+              className="cursor-pointer mt-2 w-44 text-secondary"
+            >
+              Continue Shopping{" "}
+              <img
+                className="inline-block ml-2"
+                src={assets.black_arrow_icon}
+                alt=""
+              />{" "}
+            </p>
           </div>
-        ))
-      ) : (
-        <div>
-          <p>No items in cart</p>
-          <p
-            onClick={() => navigate("/products")}
-            className="cursor-pointer mt-2 w-44 text-secondary"
+        )}
+
+        <div className="mt-8 border border-secondary/50 p-4 rounded">
+          <h2 className="text-xl font-medium mb-4 text-secondary">
+            Order Summary
+          </h2>
+          <p>Total Items: {getCartCount()}</p>
+          <p className="text-green-500">Total Amount: ${getCartAmount()}</p>
+
+          <label className="block mt-4">
+            Payment Method:
+            <select
+              value={paymentOption}
+              onChange={(e) => setPaymentOption(e.target.value)}
+              className="ml-2 border px-2"
+            >
+              <option value="COD">Cash on Delivery</option>
+              <option value="Online">Online</option>
+            </select>
+          </label>
+
+          <label className="block mt-4">
+            Shipping Address:
+            <select
+              onChange={(e) =>
+                setSelectedAddress(
+                  addresses.find((addr) => addr._id === e.target.value),
+                )
+              }
+              className="ml-2 border px-2 capitalize"
+            >
+              {addresses.map((addr) => (
+                <option key={addr._id} value={addr._id}>
+                  {addr.street}, {addr.city}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <button
+            onClick={placeOrder}
+            className="mt-6 bg-secondary text-white px-6 py-2 rounded hover:bg-primary"
           >
-            Continue Shopping{" "}
-            <img
-              className="inline-block ml-2"
-              src={assets.black_arrow_icon}
-              alt=""
-            />{" "}
-          </p>
+            {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
+          </button>
         </div>
-      )}
-
-      <div className="mt-8 border border-secondary/50 p-4 rounded">
-        <h2 className="text-xl font-medium mb-4 text-secondary">
-          Order Summary
-        </h2>
-        <p>Total Items: {getCartCount()}</p>
-        <p className="text-green-500">Total Amount: ${getCartAmount()}</p>
-
-        <label className="block mt-4">
-          Payment Method:
-          <select
-            value={paymentOption}
-            onChange={(e) => setPaymentOption(e.target.value)}
-            className="ml-2 border px-2"
-          >
-            <option value="COD">Cash on Delivery</option>
-            <option value="Online">Online</option>
-          </select>
-        </label>
-
-        <label className="block mt-4">
-          Shipping Address:
-          <select
-            onChange={(e) =>
-              setSelectedAddress(
-                addresses.find((addr) => addr._id === e.target.value),
-              )
-            }
-            className="ml-2 border px-2 capitalize"
-          >
-            {addresses.map((addr) => (
-              <option key={addr._id} value={addr._id}>
-                {addr.street}, {addr.city}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button
-          onClick={placeOrder}
-          className="mt-6 bg-secondary text-white px-6 py-2 rounded hover:bg-primary"
-        >
-          {paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"}
-        </button>
       </div>
-    </div>
+    </>
   );
 };
 

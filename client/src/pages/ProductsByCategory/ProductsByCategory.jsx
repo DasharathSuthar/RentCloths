@@ -1,7 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { categories } from "../../assets";
-import { dummyProducts } from "../../assets/assets";
 import ProductCard from "../../components/BestSeller/ProductCard/ProductCard";
 import { useAppContext } from "../../context/AppContext";
 

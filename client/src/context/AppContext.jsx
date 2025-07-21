@@ -14,10 +14,24 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [showUser, setShowUser] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState({});
   const [isProductLoading, setIsProductLoading] = useState(false);
+
+  const fetchSeller = async () => {
+    try {
+      const { data } = await axios.get("/api/seller/isAuth");
+      if (data.data) {
+        setIsSeller(true);
+      } else {
+        setIsSeller(false);
+      }
+    } catch (error) {
+      setIsSeller(false);
+    }
+  };
 
   const fecthUser = async () => {
     try {
@@ -39,11 +53,9 @@ export const AppContextProvider = ({ children }) => {
       const { data } = await axios.get("/api/products/list");
       if (data.data) {
         setProducts(data.data);
-      } else {
-        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -101,6 +113,7 @@ export const AppContextProvider = ({ children }) => {
 
   useEffect(() => {
     fecthUser();
+    fetchSeller();
     fecthProducts();
   }, []);
 
@@ -112,7 +125,7 @@ export const AppContextProvider = ({ children }) => {
           toast.error(data.message);
         }
       } catch (error) {
-        toast.error(error.message);
+        toast.error(error?.response?.data?.message);
       }
     };
 
@@ -140,6 +153,9 @@ export const AppContextProvider = ({ children }) => {
     setCartItems,
     getCartAmount,
     isProductLoading,
+    isSeller,
+    setIsSeller,
+    fecthProducts,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
