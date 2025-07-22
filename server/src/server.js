@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import cors from "cors";
+import morgan from 'morgan'
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.js";
 import connectDB from "./config/db.js";
@@ -25,6 +26,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'))
 
 app.get("/", (req, res) => {
   res.send("Api is Working");

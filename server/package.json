@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "server": "nodemon src/server.js",
+    "start": "node src/server.js",
     "format": "prettier --write ."
   },
   "keywords": [],
@@ -20,7 +21,14 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",
-    "multer": "^2.0.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.6.2"
   }
 }

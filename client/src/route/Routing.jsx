@@ -14,6 +14,7 @@ import SellerLayout from "../pages/SellerPages/SellerLayout";
 import AddProduct from "../pages/SellerPages/AddProduct";
 import ProductList from "../pages/SellerPages/ProductList";
 import Orders from "../pages/SellerPages/Orders";
+import AddAddress from "../pages/addAddress/AddAddress";
 
 const Routing = () => {
   const { isSeller } = useAppContext();
@@ -28,6 +29,7 @@ const Routing = () => {
           <Route path="products/:category/:id" element={<ProductDetails />} />
           <Route path="contact" element={<ContactUs />} />
           <Route path="cart" element={<Cart />} />
+          <Route path="addAddress" element={<AddAddress />} />
           <Route path="myorders" element={<MyOrders />} />
         </Route>
         <Route

@@ -39,7 +39,7 @@ const BestSeller = () => {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        className="mt-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+        className="mt-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
       >
         {products
           .filter((product) => product.inStock)

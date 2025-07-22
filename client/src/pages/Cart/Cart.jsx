@@ -110,12 +110,21 @@ const Cart = () => {
         quantity: item.quantity,
         size: item.size,
         rentalDays: item.rentalDays,
-        rentalStartDate: item.rentalStartDate,
-        rentalEndDate: item.rentalEndDate,
       }));
+
+      const rentalStartDate = cartArray[0]?.rentalStartDate;
+      const rentalEndDate = cartArray[0]?.rentalEndDate;
+
+      if (!rentalStartDate || !rentalEndDate) {
+        toast.error("Please select rental dates for your items");
+        return;
+      }
+
 
       const { data } = await axios.post("/api/orders/create", {
         items: itemsPayload,
+        rentalStartDate,
+        rentalEndDate,
         addressId: selectedAddress._id,
         paymentMethod: paymentOption.toLowerCase(),
       });
@@ -304,10 +313,14 @@ const Cart = () => {
             >
               {addresses.map((addr) => (
                 <option key={addr._id} value={addr._id}>
-                  {addr.street}, {addr.city}
+                  {addr.street}, {addr.city},{addr.state},{addr.country}
                 </option>
               ))}
             </select>
+
+            <p onClick={() => navigate('/addAddress')} className="text-white rounded inline-block bg-secondary  ml-3 text-center cursor-pointer p-2 hover:bg-primary">
+              Add address
+            </p>
           </label>
 
           <button
