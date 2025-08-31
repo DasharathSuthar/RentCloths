@@ -14,6 +14,9 @@ export class OrderService {
   }
 
   async getAllOrders() {
-    return await Order.find({});
+    return await Order.find({}).populate({
+      path: "items.product",
+      model: "Product",
+    }).populate("address");
   }
 }

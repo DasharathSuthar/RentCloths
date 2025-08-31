@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 const MyOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
-  const { axios, user, navigate } = useAppContext();
+  const { axios, user, navigate ,currency} = useAppContext();
 
   const fecthMyOrders = async () => {
     try {
@@ -42,7 +42,7 @@ const MyOrders = () => {
               <span>OrderId : {order._id}</span>
               <span className="uppercase">Payment : {order.paymentMethod}</span>
               <span className="text-green-400">
-                TotalAmount : ${order.totalAmount}
+                TotalAmount : {currency}{order.totalAmount}
               </span>
             </p>
             {order.items.map((item, index) => (
@@ -81,7 +81,7 @@ const MyOrders = () => {
                 </div>
 
                 <p className="text-lg font-medium text-secondary">
-                  AmountPerProduct : ${item.product.offerPrice * item.quantity}
+                  AmountPerProduct : {currency}{item.product.offerPrice * item.quantity}
                 </p>
               </div>
             ))}

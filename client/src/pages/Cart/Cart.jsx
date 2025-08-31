@@ -14,6 +14,7 @@ const Cart = () => {
     getCartCount,
     updateCartItem,
     navigate,
+    currency
   } = useAppContext();
 
   const [cartArray, setCartArray] = useState([]);
@@ -171,7 +172,7 @@ const Cart = () => {
                 />
                 <div>
                   <h2 className="font-bold capitalize">{product.name}</h2>
-                  <p>Price per Day: ${product.offerPrice}</p>
+                  <p>Price per Day: {currency}{product.offerPrice}</p>
                   <label>
                     Size:
                     <select
@@ -253,7 +254,7 @@ const Cart = () => {
                   </select>
                 </div>
                 <p className="mt-2 text-green-500">
-                  Subtotal: $
+                  Subtotal: {currency}
                   {product.offerPrice * product.quantity * product.rentalDays}
                 </p>
                 <button
@@ -287,7 +288,7 @@ const Cart = () => {
             Order Summary
           </h2>
           <p>Total Items: {getCartCount()}</p>
-          <p className="text-green-500">Total Amount: ${getCartAmount()}</p>
+          <p className="text-green-500">Total Amount: {currency}{getCartAmount()}</p>
 
           <label className="block mt-4">
             Payment Method:

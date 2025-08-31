@@ -5,7 +5,7 @@ import { useAppContext } from "../../context/AppContext";
 import { ToastContainer, toast } from "react-toastify";
 
 const ProductDetails = () => {
-  const { products, navigate, addToCart, isProductLoading } = useAppContext();
+  const { products, navigate, addToCart, isProductLoading, currency } = useAppContext();
 
   const { id } = useParams();
 
@@ -65,9 +65,9 @@ const ProductDetails = () => {
 
               <div className="mt-6">
                 <p className="text-gray-500/70 line-through">
-                  MRP:$ {product.price}
+                  MRP:{currency} {product.price}
                 </p>
-                <p className="text-2xl font-medium">MRP:$ {product.offerPrice}</p>
+                <p className="text-2xl font-medium">MRP:{currency} {product.offerPrice}</p>
                 <span className="text-gray-500/70">(inclusive of all taxes)</span>
               </div>
 

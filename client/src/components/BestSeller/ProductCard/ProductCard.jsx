@@ -3,7 +3,7 @@ import { assets } from "../../../assets/assets";
 import { useAppContext } from "../../../context/AppContext";
 
 const ProductCard = ({ product }) => {
-  const { addToCart, removeFromCart, cartItems, navigate } = useAppContext();
+  const { addToCart, removeFromCart, cartItems, navigate, currency } = useAppContext();
 
   return (
     product && (
@@ -43,9 +43,9 @@ const ProductCard = ({ product }) => {
           </div>
           <div className="flex items-end justify-between mt-3">
             <p className="md:text-xl text-base font-medium text-secondary">
-              ${product.offerPrice}{" "}
+              {currency}{product.offerPrice}{" "}
               <span className="text-gray-500/60 md:text-sm text-xs line-through">
-                ${product.price}
+                {currency}{product.price}
               </span>
             </p>
             <div

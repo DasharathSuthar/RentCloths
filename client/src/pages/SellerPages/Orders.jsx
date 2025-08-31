@@ -19,10 +19,11 @@ const Orders = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders()
+  
   }, []);
 
-  return orders.length > 0 ? (
+  return orders?.length > 0 ? (
     <>
       <ToastContainer position="top-center" autoClose={2000} />
       <div className="no-scrollbar flex-1 h-[95vh] overflow-y-scroll">
@@ -55,25 +56,25 @@ const Orders = () => {
 
               <div className="text-sm md:text-base text-black/60">
                 <p className="text-black/80">
-                  {order.address.firstName} {order.address.lastName}
+                  {order.address?.firstName} {order.address?.lastName}
                 </p>
                 <p className="text-black/80">
-                  {order.address.street}, {order.address.city},
+                  {order.address?.street}, {order.address?.city},
                 </p>
                 <p className="text-black/80">
-                  {order.address.state},{order.address.zipcode},{" "}
-                  {order.address.country}
+                  {order.address?.state},{order.address?.zipcode},{" "}
+                  {order.address?.country}
                 </p>
-                <p>{order.address.phone}</p>
+                <p>{order.address?.phone}</p>
               </div>
 
               <p className="font-medium text-base my-auto text-black/70">
                 {currency}
-                {order.amount}
+                {order.totalAmount}
               </p>
 
               <div className="flex flex-col text-sm">
-                <p>Method: {order.paymentType}</p>
+                <p>Method: {order.paymentMethod}</p>
                 <p>Date: {new Date(order.createdAt).toLocaleDateString()}</p>
                 <p>Payment: {order.isPaid ? "Paid" : "Pending"}</p>
               </div>
